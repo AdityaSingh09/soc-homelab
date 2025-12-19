@@ -1,0 +1,32 @@
+flowchart LR
+  %% =========================
+  %% Enterprise SOC Homelab
+  %% =========================
+
+  subgraph HOST["Homelab Host (Proxmox VE)"]
+    direction TB
+
+    subgraph NET["Virtual Lab Network (isolated)"]
+      direction LR
+
+      KALI["Kali Linux VM\n(Attacker)\n10.10.10.40"]
+      WIN["Windows 10 VM\n(Endpoint)\n10.10.10.20"]
+      LNX["Ubuntu Server VM\n(Linux Server)\n10.10.10.30"]
+      SIEM["Ubuntu Server VM\n(SOC / SIEM)\nWazuh Manager\n10.10.10.10"]
+    end
+  end
+
+  %% Attack paths
+  KALI -->|scan / exploit attempts| WIN
+  KALI -->|scan / brute force| LNX
+
+  %% Telemetry / log flow
+  WIN -->|telemetry + logs| SIEM
+  LNX -->|telemetry + logs| SIEM
+
+  %% Analyst interaction
+  ANALYST["You (Analyst)\nHost Browser / SSH"] -->|dashboards / triage| SIEM
+
+  %% Styling (optional)
+  classDef critical fill:#fff,stroke:#111,stroke-width:1px;
+  class SIEM critical;
